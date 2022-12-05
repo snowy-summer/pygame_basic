@@ -21,7 +21,7 @@ character_x_pos = (screen_width/2) -(character_width/2) #화면 가로의 절반
 character_y_pos = screen_height - character_height #화면 세로크기 가장 아래에 해당하는 곳에 위치
 
 
-
+#a
 
 
 # 이벤트 루프  안꺼지게 하려고 
