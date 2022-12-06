@@ -1,6 +1,5 @@
 import pygame
-######################################################################################################################################
-# 기본 초기화 (반드시 해야 하는 것들)
+import random
 
 pygame.init() # 초기화 (반드시 필요)
 
@@ -14,14 +13,11 @@ pygame.display.set_caption("first game")
 #FPS
 clock =pygame.time.Clock()
 
-
-########################################################################################################################################
-# 1. 사용자 게임 초기화 ( 배경 화면 , 게임 이미지, 속도 ,  폰트 등)
 #배경 이미지 불러오기
 background = pygame.image.load("D:/bum/pygame_basic/background.png") #파일 경로 복사해서 넣기
 
 #캐릭터(스프라이트) 불러오기
-character = pygame.image.load("D:/bum/pygame_basic/character.png")
+character = pygame.image.load("D:/bum/pygame_basic/character1.png")
 character_size = character.get_rect().size #이미지 크기를 구해옴
 character_width = character_size[0] #캐릭터 가로
 character_height = character_size[1] #캐릭터 새로
@@ -32,17 +28,17 @@ character_y_pos = screen_height - character_height #화면 세로크기 가장 �
 # 이동할 좌표
 To_x = 0
 To_y = 0
-
 #이동 속도
 character_speed = 0.6
+enemy_speed = 0.6
 
 #적 캐릭터
-enemy = pygame.image.load("D:/bum/pygame_basic/enemy.png")
+enemy = pygame.image.load("D:/bum/pygame_basic/character2.png")
 enemy_size = enemy.get_rect().size #이미지 크기를 구해옴
 enemy_width = enemy_size[0] #캐릭터 가로
 enemy_height = enemy_size[1] #캐릭터 새로
-enemy_x_pos = (screen_width/2) -(enemy_width/2) #화면 가로의 절반 크기에 해당하는 곳에 위치
-enemy_y_pos = (screen_height/2) - (enemy_height/2) #화면 세로크기 가장 아래에 해당하는 곳에 위치
+enemy_x_pos = random.randint(0,screen_width - enemy_width) #화면 가로의 절반 크기에 해당하는 곳에 위치
+enemy_y_pos = 0 
 
 # 폰트 정의 
 game_font = pygame.font.Font(None,40) # 폰트 객체 생성 (폰트 , 크기)
@@ -57,15 +53,16 @@ start_ticks = pygame.time.get_ticks() #시작 tick 을 받아옴
 # 이벤트 루프  안꺼지게 하려고 
 running = True # 게임이 진행중인가?
 while running:
-    dt = clock.tick(60)#게임화면의 초당 프레임 수 설정
+    dt = clock.tick(30)#게임화면의 초당 프레임 수 설정
     #캐릭터가 1초동안 100만큼 이동해야함
     #10fps : 1초동안 10번 동작 -> 1번에 10만큼   10*10
     #20fps : 1초동안 20번 동작 -> 1번에 5만큼    5*20  
 
+    enemy_to_y = 0
+    enemy_to_y += enemy_speed
+    character_x_pos += To_x *dt
+    enemy_y_pos += enemy_to_y *dt
 
-
- #######################################################################################################
-  #2. 이벤트 처리(키보드 , 마우스)
     for event in pygame.event.get(): # 어떤 이벤트가 발생하였는가
         if event.type == pygame.QUIT: # 창이 닫히는 이벤트가 발생하였는가?
             running = False
@@ -77,23 +74,18 @@ while running:
             elif event.key == pygame.K_RIGHT: # 오른쪽 이동
                 To_x += character_speed
                 
-            elif event.key == pygame.K_UP: #위쪽이동
-                To_y-= character_speed
-                
-            elif event.key == pygame.K_DOWN: #아래이동
-                To_y+= character_speed
-                
+        
         if event.type == pygame.KEYUP: # 방향키를 떼면 멈춤
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 To_x = 0
-            elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                To_y = 0
- 
- #############################################################################################################
-  # 3. 게임 캐릭터 위치 정의
+        
+        if enemy_y_pos > screen_height:
+            enemy_y_pos = 0
+            enemy_x_pos = random.randint(0,screen_width-enemy_width)
 
-    character_x_pos += To_x *dt
-    character_y_pos += To_y *dt
+
+  
+
 
     #가로 경계값처리
     if character_x_pos < 0:
@@ -105,9 +97,6 @@ while running:
         character_y_pos =0
     elif character_y_pos >screen_height - character_height:
         character_y_pos = screen_height - character_height
-
-   ##############################################################################################
-   # 4. 충돌 처리
 
     #충돌 처리
     character_rect = character.get_rect()
@@ -123,9 +112,6 @@ while running:
         print("충돌")
         running = False
 
- ##########################################################################################
- # 5. 화면에 그리기
- 
     #배경그리기
     screen.blit(background, (0,0)) 
 
